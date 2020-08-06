@@ -6,8 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.*
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.model.User
 import com.jaques.projetos.organizze.settings.SettingsFirebase
@@ -72,9 +71,23 @@ class RegisterActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     updateUI(user)
                 } else {
+                    var exception = ""
+                    try {
+                        throw task.exception!!
+                    } catch (e: FirebaseAuthWeakPasswordException) {
+                        exception = "Digite uma senha mais forte!"
+                    } catch (e: FirebaseAuthInvalidCredentialsException) {
+                        exception = "Por favor, digite um e-mail válido"
+                    } catch (e: FirebaseAuthUserCollisionException) {
+                        exception = "Essa conta já foi cadastrada"
+                    } catch (e: Exception) {
+                        exception = "Erro ao cadastrar o usuário ${e.message}"
+                        e.printStackTrace()
+                    }
+
                     // If sign in fails, display a message to the user.
                     Toast.makeText(
-                        baseContext, "Falha ao cadastrar",
+                        baseContext, exception,
                         Toast.LENGTH_SHORT
                     ).show()
                     updateUI(null)
