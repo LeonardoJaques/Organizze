@@ -1,13 +1,90 @@
-
 package com.jaques.projetos.organizze.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.model.User
+import com.jaques.projetos.organizze.settings.SettingsFirebase
+import kotlinx.android.synthetic.main.activity_register.*
+
 
 class RegisterActivity : AppCompatActivity() {
+
+    private lateinit var fieldName: EditText
+    private lateinit var fieldEmail: EditText
+    private lateinit var fieldPassword: EditText
+    private lateinit var buttonRegister: Button
+    private lateinit var user: User
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        fieldName = editName
+        fieldEmail = editEmail
+        fieldPassword = editPassword
+        buttonRegister = buttonRegisterView
+
+
+        buttonRegister.setOnClickListener {
+            val textName = fieldName.text.toString()
+            val textEmail = fieldEmail.text.toString()
+            val textPassword = fieldPassword.text.toString()
+
+            when {
+                textName.isEmpty() -> Toast.makeText(
+                    this,
+                    "Preencha o nome!",
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+                textEmail.isEmpty() -> Toast.makeText(
+                    this,
+                    "Preencha o email!",
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+                textPassword.isEmpty() -> Toast.makeText(
+                    this,
+                    "Preencha a senha!",
+                    Toast.LENGTH_LONG
+                ).show()
+                else -> {
+                    user = User(textName, textEmail, textPassword)
+                    registerUser()
+                }
+            }
+        }
     }
+
+    fun registerUser() {
+        val auth = SettingsFirebase.getFirebaseAuthOrganizze()
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    val user = auth.currentUser
+                    updateUI(user)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Toast.makeText(
+                        baseContext, "Falha ao cadastrar",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateUI(null)
+                }
+            }
+    }
+
+    private fun updateUI(user: FirebaseUser?) {
+        Toast.makeText(this, "Usuario cadastrado com sucesso", Toast.LENGTH_LONG).show()
+    }
+
 }
+

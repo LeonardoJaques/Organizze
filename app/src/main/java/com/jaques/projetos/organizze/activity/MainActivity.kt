@@ -1,14 +1,11 @@
-package com.jaques.projetos.organizze
+package com.jaques.projetos.organizze.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
-import com.jaques.projetos.organizze.activity.LoginActivity
-import com.jaques.projetos.organizze.activity.RegisterActivity
+import com.jaques.projetos.organizze.R
 
 class MainActivity : IntroActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
