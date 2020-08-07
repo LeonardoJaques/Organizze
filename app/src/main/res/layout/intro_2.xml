@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Saiba aonde esta indo seu dinheiro"
+        android:text="Saiba aonde esta indo o seu dinheiro"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="18sp"

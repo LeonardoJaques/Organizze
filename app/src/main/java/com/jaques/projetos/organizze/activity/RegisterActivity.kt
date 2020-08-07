@@ -84,7 +84,6 @@ class RegisterActivity : AppCompatActivity() {
                         exception = "Erro ao cadastrar o usuário ${e.message}"
                         e.printStackTrace()
                     }
-
                     // If sign in fails, display a message to the user.
                     Toast.makeText(
                         baseContext, exception,
