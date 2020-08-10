@@ -1,5 +1,6 @@
 package com.jaques.projetos.organizze.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -83,6 +84,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateUI(user: FirebaseUser?) {
         Toast.makeText(this, "Usuario Logado com sucesso", Toast.LENGTH_LONG).show()
+        openMajorScream()
     }
 
+    private fun openMajorScream() {
+        startActivity(Intent(this, MajorActivity::class.java))
+        finish()
+    }
 }

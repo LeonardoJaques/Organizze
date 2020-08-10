@@ -7,11 +7,11 @@
     tools:context=".activity.RegisterActivity">
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/textViewCreateAcount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="Cria sua conta grátis"
+        android:text="@string/createacount"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -22,37 +22,39 @@
         app:layout_constraintVertical_chainStyle="packed" />
 
     <EditText
-        android:id="@+id/editPassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:drawableLeft="@drawable/ic_baseline_lock_24"
-        android:drawablePadding="5dp"
-        android:ems="10"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/buttonRegisterView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editEmail" />
-
-    <EditText
         android:id="@+id/editName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
-        android:drawableLeft="@drawable/ic_baseline_person_24"
+        android:drawableStart="@drawable/ic_baseline_person_24"
         android:drawablePadding="5dp"
         android:ems="10"
-        android:hint="Nome"
+        android:hint="@string/name"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/editEmail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewCreateAcount"
+        android:autofillHints="" />
+
+    <EditText
+        android:id="@+id/editPassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:drawableStart="@drawable/ic_baseline_lock_24"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRegisterView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editEmail"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/editEmail"
@@ -61,15 +63,16 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
-        android:drawableLeft="@drawable/ic_baseline_email_24"
+        android:drawableStart="@drawable/ic_baseline_email_24"
         android:drawablePadding="5dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="@string/email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/editPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editName" />
+        app:layout_constraintTop_toBottomOf="@+id/editName"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/buttonRegisterView"
@@ -80,7 +83,7 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
         android:background="@color/colorPrimary"
-        android:text="Cadastrar"
+        android:text="@string/register"
         android:textColor="@color/mi_text_color_primary_dark"
         app:layout_constraintBottom_toTopOf="@+id/editTerms"
         app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +94,7 @@
         android:id="@+id/editTerms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Termos de uso"
+        android:text="@string/useTerms"
         android:textColor="@android:color/secondary_text_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

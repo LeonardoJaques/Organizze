@@ -1,5 +1,6 @@
 package com.jaques.projetos.organizze.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -96,7 +97,12 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun updateUI(user: FirebaseUser?) {
         Toast.makeText(this, "Usuario cadastrado com sucesso", Toast.LENGTH_LONG).show()
+        openMajorScream()
     }
 
+    private fun openMajorScream() {
+        startActivity(Intent(this, MajorActivity::class.java))
+        finish()
+    }
 }
 

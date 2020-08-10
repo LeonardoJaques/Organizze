@@ -6,11 +6,19 @@ import android.view.View
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.settings.SettingsFirebase
 
 class MainActivity : IntroActivity() {
+
+    override fun onStart() {
+        super.onStart()
+        validadeUserLogin()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        setContentView(R.layout.activity_main)
+
 
         isButtonBackVisible = false
         isButtonNextVisible = false
@@ -42,11 +50,22 @@ class MainActivity : IntroActivity() {
         }
     }
 
+
     fun btEnter(view: View) {
         startActivity(Intent(this, LoginActivity::class.java))
     }
 
     fun btRegister(view: View) {
         startActivity(Intent(this, RegisterActivity::class.java))
+    }
+
+    fun validadeUserLogin() {
+        val auth = SettingsFirebase.getFirebaseAuthOrganizze()
+//        auth.signOut()
+        if (auth.currentUser != null) openMajorScream()
+    }
+
+    private fun openMajorScream() {
+        startActivity(Intent(this, MajorActivity::class.java))
     }
 }
