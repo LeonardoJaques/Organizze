@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,18 +17,45 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="MajorActivity" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_major" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:layout_gravity="end|bottom"
+        android:layout_margin="10dp"
+        app:menu_colorNormal="@color/colorAccent"
+        app:menu_colorPressed="@color/colorAccent_dark"
+        fab:menu_icon="@drawable/ic_baseline_add_24">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_expense"
+            android:onClick="addExpense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_add_24"
+            fab:fab_label="@string/expense_name"
+            fab:fab_colorNormal="@color/colorPrimaryExpense"
+            fab:fab_colorPressed="@color/colorPrimaryDarkExpense"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_revenue"
+            android:onClick="addRevenue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_add_24"
+            fab:fab_label="@string/revenue_name"
+            fab:fab_colorNormal="@color/colorAccentRevenue"
+            fab:fab_colorPressed="@color/colorPrimaryDarkRevenue"
+            fab:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

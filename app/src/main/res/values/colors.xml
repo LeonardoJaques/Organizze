@@ -3,4 +3,15 @@
     <color name="colorPrimary">#01C7D2</color>
     <color name="colorPrimaryDark">#00B2BC</color>
     <color name="colorAccent">#FF706A</color>
+    <color name="colorAccent_dark">#E66560</color>
+
+    <!-- color expense -->
+    <color name="colorPrimaryExpense">#FF706A</color>
+    <color name="colorPrimaryDarkExpense">#E66560</color>
+    <color name="colorAccentExpense">#FF706A</color>
+
+    <!-- color revenue -->
+    <color name="colorPrimaryRevenue">#00D39E</color>
+    <color name="colorPrimaryDarkRevenue">#00BE8B</color>
+    <color name="colorAccentRevenue">#00D39E</color>
 </resources>
