@@ -7,6 +7,25 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Theme application in expenses. -->
+    <style name="expenseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimaryExpense</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkExpense</item>
+        <item name="colorAccent">@color/colorAccentExpense</item>
+    </style>
+
+    <!-- Theme application in revenues. -->
+    <style name="revenueTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimaryRevenue</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkRevenue</item>
+        <item name="colorAccent">@color/colorAccentRevenue</item>
+    </style>
+
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

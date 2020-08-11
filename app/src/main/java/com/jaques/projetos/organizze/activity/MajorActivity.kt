@@ -1,5 +1,6 @@
 package com.jaques.projetos.organizze.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,7 +21,11 @@ class MajorActivity : AppCompatActivity() {
 //        }
     }
 
-    fun addExpense(view: View) {}
-    fun addRevenue(view: View) {}
+    fun addExpense(view: View) =
+        startActivity(Intent(this, ExpenseActivity::class.java))
+
+
+    fun addRevenue(view: View) =
+        startActivity(Intent(this, RevenueActivity::class.java))
 
 }
