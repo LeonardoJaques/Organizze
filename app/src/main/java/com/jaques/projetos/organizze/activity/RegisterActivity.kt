@@ -8,8 +8,10 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.*
+import com.google.firebase.database.*
 import com.jaques.projetos.organizze.R
-import com.jaques.projetos.organizze.model.User
+import com.jaques.projetos.organizze.helper.Base64Custom
+import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -20,7 +22,10 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var fieldEmail: EditText
     private lateinit var fieldPassword: EditText
     private lateinit var buttonRegister: Button
-    private lateinit var user: User
+    private lateinit var userOgzz: UserOgzz
+
+    private val referencia: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val usuario: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +61,7 @@ class RegisterActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 else -> {
-                    user = User(textName, textEmail, textPassword)
+                    userOgzz = UserOgzz(textName, textEmail, textPassword)
                     registerUser()
                 }
             }
@@ -65,12 +70,14 @@ class RegisterActivity : AppCompatActivity() {
 
     fun registerUser() {
         val auth = SettingsFirebase.getFirebaseAuthOrganizze()
-        auth.createUserWithEmailAndPassword(user.email, user.password)
+        auth.createUserWithEmailAndPassword(userOgzz.email, userOgzz.password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     val user = auth.currentUser
                     updateUI(user)
+                    userOgzz.saveUserOgzz()
+
                 } else {
                     var exception = ""
                     try {
@@ -104,5 +111,8 @@ class RegisterActivity : AppCompatActivity() {
         startActivity(Intent(this, MajorActivity::class.java))
         finish()
     }
+
+
 }
+
 

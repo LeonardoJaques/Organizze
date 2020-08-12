@@ -6,18 +6,17 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 
 import com.jaques.projetos.organizze.R
-import com.jaques.projetos.organizze.model.User
+import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import kotlinx.android.synthetic.main.activity_login.*
 
 private lateinit var fieldEmailLogin: EditText
 private lateinit var fieldPasswordLogin: EditText
 private lateinit var btEnterLogin: Button
-private lateinit var user: User
+private lateinit var userOgzz: UserOgzz
 
 
 class LoginActivity : AppCompatActivity() {
@@ -46,9 +45,9 @@ class LoginActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 else -> {
-                    user = User()
-                    user.email = textEmail
-                    user.password = textPassword
+                    userOgzz = UserOgzz()
+                    userOgzz.email = textEmail
+                    userOgzz.password = textPassword
                     validateLogin()
                 }
             }
@@ -57,7 +56,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun validateLogin() {
         val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
-        auth.signInWithEmailAndPassword(user.email, user.password)
+        auth.signInWithEmailAndPassword(userOgzz.email, userOgzz.password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
