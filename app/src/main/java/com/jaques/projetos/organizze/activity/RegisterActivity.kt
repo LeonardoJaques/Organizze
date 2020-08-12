@@ -2,15 +2,15 @@ package com.jaques.projetos.organizze.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.*
-import com.google.firebase.database.*
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
 import com.jaques.projetos.organizze.R
-import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import kotlinx.android.synthetic.main.activity_register.*
@@ -24,8 +24,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var buttonRegister: Button
     private lateinit var userOgzz: UserOgzz
 
-    private val referencia: DatabaseReference = FirebaseDatabase.getInstance().reference
-    private val usuario: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +66,8 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    fun registerUser() {
+
+    private fun registerUser() {
         val auth = SettingsFirebase.getFirebaseAuthOrganizze()
         auth.createUserWithEmailAndPassword(userOgzz.email, userOgzz.password)
             .addOnCompleteListener(this) { task ->

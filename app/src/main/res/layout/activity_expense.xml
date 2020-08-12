@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.RevenueActivity">
+    tools:context=".activity.ExpenseActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/editViewExpenseValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -28,7 +28,8 @@
             android:inputType="numberDecimal"
             android:textAlignment="textEnd"
             android:textColor="@android:color/white"
-            android:textSize="30sp" />
+            android:textSize="30sp"
+            android:autofillHints="" />
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -46,9 +47,10 @@
         app:layout_constraintVertical_chainStyle="packed">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewDateExpense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/e_value" />
+            android:hint="@string/ex_data_expense" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -64,6 +66,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewOutflow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_financial_outflow" />
@@ -82,13 +85,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_monthly_financial_outflow" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/fabSaveExpenseView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"

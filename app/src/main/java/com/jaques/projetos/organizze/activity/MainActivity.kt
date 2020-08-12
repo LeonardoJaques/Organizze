@@ -12,7 +12,7 @@ class MainActivity : IntroActivity() {
 
     override fun onStart() {
         super.onStart()
-        validadeUserLogin()
+        validateUserLogin()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,9 +59,9 @@ class MainActivity : IntroActivity() {
         startActivity(Intent(this, RegisterActivity::class.java))
     }
 
-    fun validadeUserLogin() {
+    private fun validateUserLogin() {
         val auth = SettingsFirebase.getFirebaseAuthOrganizze()
-        auth.signOut()
+//        auth.signOut()
         if (auth.currentUser != null) openMajorScream()
     }
 
