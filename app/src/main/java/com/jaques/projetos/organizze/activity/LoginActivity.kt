@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 private lateinit var fieldEmailLogin: EditText
 private lateinit var fieldPasswordLogin: EditText
 private lateinit var btEnterLogin: Button
-private lateinit var userOgzz: UserOgzz
+internal lateinit var userOgzz: UserOgzz
 
 
 class LoginActivity : AppCompatActivity() {

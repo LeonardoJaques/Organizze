@@ -3,6 +3,7 @@ package com.jaques.projetos.organizze.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.heinrichreimersoftware.materialintro.app.IntroActivity
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide
 import com.jaques.projetos.organizze.R
@@ -67,7 +68,9 @@ class MainActivity : IntroActivity() {
 
     private fun openMajorScream() {
         startActivity(Intent(this, MajorActivity::class.java))
+
     }
+
 
 }
 

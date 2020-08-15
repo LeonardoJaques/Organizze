@@ -21,5 +21,7 @@ class SettingsFirebase {
         fun getFirebaseRefenceOrganizze(): FirebaseDatabase {
             return Firebase.database
         }
+
+
     }
 }

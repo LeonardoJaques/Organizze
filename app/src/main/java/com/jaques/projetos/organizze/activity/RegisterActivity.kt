@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import kotlinx.android.synthetic.main.activity_register.*
