@@ -15,6 +15,14 @@ class DateCustom {
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             return current.format(formatter)
         }
+
+        fun dateChoose(date: String): String {
+            val returnDate = date.split("/")
+            val day = returnDate[0]
+            val month = returnDate[1]
+            val year = returnDate[2]
+            return month + year
+        }
     }
 
 }

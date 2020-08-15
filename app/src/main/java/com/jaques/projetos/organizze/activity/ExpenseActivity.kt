@@ -2,6 +2,7 @@ package com.jaques.projetos.organizze.activity
 
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
@@ -33,22 +34,34 @@ class ExpenseActivity : AppCompatActivity() {
 
 
         floatingActionButton.setOnClickListener {
-
-            saveExpense()
+            when {
+                fieldCategory.text!!.isEmpty() -> Toast.makeText(
+                    this,
+                    "Preecha a Categoria",
+                    Toast.LENGTH_LONG
+                ).show()
+                fieldDescription.text!!.isEmpty() -> Toast.makeText(
+                    this,
+                    "Preecha a Descrição",
+                    Toast.LENGTH_LONG
+                ).show()
+                fieldValue.text.toString().isEmpty() -> Toast.makeText(
+                    this,
+                    "Preecha o valor",
+                    Toast.LENGTH_LONG
+                ).show()
+                else -> saveExpense()
+            }
         }
     }
 
     private fun saveExpense() {
         val movement = Movement()
-
-
         val category = fieldCategory.text
         val description = fieldDescription.text
         val value = fieldValue.text.toString().toDouble()
-        val date = fieldDate.text
-
+        val date = fieldDate.text.toString()
         movement.saveMovementOgzz(category, description, value, date)
-
 
     }
 

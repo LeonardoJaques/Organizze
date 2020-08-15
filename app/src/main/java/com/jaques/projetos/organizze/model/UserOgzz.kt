@@ -24,11 +24,12 @@ internal data class UserOgzz(
 
         val database = SettingsFirebase.getFirebaseRefenceOrganizze()
         val myRef = database.getReference("users")
+        val sequence = myRef.child(id)
 
-        myRef.child(id).child("name").setValue(name)
-        myRef.child(id).child("email").setValue(email)
-        myRef.child(id).child("totalExpenses").setValue(totalRevenue)
-        myRef.child(id).child("totalRevenue").setValue(totalRevenue)
+        sequence.child("name").setValue(name)
+        sequence.child("email").setValue(email)
+        sequence.child("totalExpenses").setValue(totalRevenue)
+        sequence.child("totalRevenue").setValue(totalRevenue)
 
     }
 
