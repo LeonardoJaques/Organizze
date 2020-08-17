@@ -83,6 +83,7 @@ class ExpenseActivity : AppCompatActivity() {
         val updateValue = value + totalExpense
         userData().setValue(updateValue)
         movement.saveMovementOgzz(category, description, value, date, type)
+        finish()
     }
 
     private fun getExpenseTotal(): Double {

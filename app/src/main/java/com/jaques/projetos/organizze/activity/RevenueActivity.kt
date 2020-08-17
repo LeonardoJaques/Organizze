@@ -45,6 +45,7 @@ class RevenueActivity : AppCompatActivity() {
 
         floatingActionButton.setOnClickListener {
             validateFieldsRevenue()
+
         }
 
     }
@@ -83,6 +84,7 @@ class RevenueActivity : AppCompatActivity() {
         val updateValue = value + totalRevenue
         userData().setValue(updateValue)
         movement.saveMovementOgzz(category, description, value, date, type)
+        finish()
     }
 
     private fun getRevenueTotal(): Double {
