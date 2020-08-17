@@ -37,8 +37,8 @@ class ExpenseActivity : AppCompatActivity() {
 
         fieldValue = editViewExpenseValue
         fieldDate = editViewDateExpense
-        fieldCategory = editViewOutflow
-        fieldDescription = editViewDescription
+        fieldCategory = editViewOutflowE
+        fieldDescription = editViewDescriptionE
         floatingActionButton = fabSaveExpenseView
 
         fieldDate.setText(DateCustom.dateCurrent())
@@ -78,10 +78,11 @@ class ExpenseActivity : AppCompatActivity() {
         val description = fieldDescription.text
         val value = fieldValue.text.toString().toDouble()
         val date = fieldDate.text.toString()
+        val type = "e"
 
         val updateValue = value + totalExpense
         userData().setValue(updateValue)
-        movement.saveMovementOgzz(category, description, value, date)
+        movement.saveMovementOgzz(category, description, value, date, type)
     }
 
     private fun getExpenseTotal(): Double {

@@ -46,6 +46,7 @@
         app:layout_constraintVertical_chainStyle="packed">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewDateRevenue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_data_revenue" />
@@ -64,6 +65,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewEntryR"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_financial_entry" />
@@ -82,13 +84,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editViewDescriptionR"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_monthly_financial_entry" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSaveExpebseView"
+        android:id="@+id/fabSaveRevenueView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
