@@ -1,7 +1,6 @@
 package com.jaques.projetos.organizze.activity
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,13 +9,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.helper.DateCustom
 import com.jaques.projetos.organizze.model.Movement
-import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import kotlinx.android.synthetic.main.activity_expense.*
 
@@ -27,9 +25,6 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var fieldCategory: TextInputEditText
     private lateinit var fieldDescription: TextInputEditText
     private lateinit var fieldValue: EditText
-
-    private val database = SettingsFirebase.getFirebaseRefenceOrganizze().reference
-    private val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
 
     private var totalExpense: Double = 0.00
 
@@ -85,18 +80,12 @@ class ExpenseActivity : AppCompatActivity() {
         val date = fieldDate.text.toString()
 
         val updateValue = value + totalExpense
-
-        updateExpenseTotal(updateValue)
+        userData().setValue(updateValue)
         movement.saveMovementOgzz(category, description, value, date)
     }
 
     private fun getExpenseTotal(): Double {
-        val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
-        val myRef = database.child("users")
-            .child(id)
-            .child("totalExpense")
-
-        myRef.addValueEventListener(object : ValueEventListener {
+        userData().addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
@@ -109,16 +98,22 @@ class ExpenseActivity : AppCompatActivity() {
         return totalExpense
     }
 
+    private fun userData(): DatabaseReference {
+        val database = SettingsFirebase
+            .getFirebaseRefenceOrganizze()
+            .reference
+        val auth: FirebaseAuth = SettingsFirebase
+            .getFirebaseAuthOrganizze()
 
-    private fun updateExpenseTotal(value: Double) {
-
-        val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
-        database.child("users")
+        val id = Base64Custom.codeBase64(
+            auth.currentUser!!
+                .email
+                .toString()
+        )
+        return database.child("users")
             .child(id)
             .child("totalExpense")
-            .setValue(value)
     }
-
 
 }
 
