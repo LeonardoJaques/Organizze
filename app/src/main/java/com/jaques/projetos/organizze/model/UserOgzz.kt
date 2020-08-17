@@ -12,7 +12,7 @@ internal data class UserOgzz(
     internal var name: String = "",
     internal var email: String = "",
     internal var password: String = "",
-    internal var totalExpenses: Double = 0.00,
+    internal var totalExpense: Double = 0.00,
     internal var totalRevenue: Double = 0.00
 
 ) {
@@ -28,7 +28,7 @@ internal data class UserOgzz(
 
         sequence.child("name").setValue(name)
         sequence.child("email").setValue(email)
-        sequence.child("totalExpenses").setValue(totalRevenue)
+        sequence.child("totalExpense").setValue(totalExpense)
         sequence.child("totalRevenue").setValue(totalRevenue)
 
     }
