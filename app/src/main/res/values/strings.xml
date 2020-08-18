@@ -18,6 +18,7 @@
     <!--  MajorActivity  -->
     <string name="expense_name">Despesa</string>
     <string name="revenue_name">Receita</string>
+    <string name="welcome_name">Olá</string>
 
     <!--  Revenue  -->
     <string name="ex_financial_entry">Ex: Entrada Financeira</string>
@@ -30,7 +31,7 @@
     <string name="ex_monthly_financial_outflow">Ex: Saída financeira mensal</string>
     <string name="ex_data_expense">Ex: 19/10/2020</string>
     <string name="e_value">R$ 00.00</string>
-    <string name="charge">Carregando...</string>
+    <string name="charge">Carregando…</string>
     <string name="balance_major">R$0.00</string>
     <string name="signout">sair</string>
 

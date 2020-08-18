@@ -20,16 +20,17 @@
 
         <EditText
             android:id="@+id/editViewExpenseValue"
+            style="@style/Base.Widget.MaterialComponents.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:background="@android:color/transparent"
             android:ems="10"
             android:hint="@string/r_value"
             android:inputType="numberDecimal"
             android:textAlignment="textEnd"
             android:textColor="@android:color/white"
-            android:textSize="30sp"
-            android:autofillHints="" />
+            android:textSize="30sp" />
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -50,7 +51,8 @@
             android:id="@+id/editViewDateExpense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/ex_data_expense" />
+            android:hint="@string/ex_data_expense"
+            android:inputType="date" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout

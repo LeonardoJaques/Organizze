@@ -27,13 +27,12 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var fieldValue: EditText
 
     private var totalExpense: Double = 0.00
-
-
     private lateinit var floatingActionButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense)
+
 
         fieldValue = editViewExpenseValue
         fieldDate = editViewDateExpense
