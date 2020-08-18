@@ -62,7 +62,6 @@ class MainActivity : IntroActivity() {
 
     private fun validateUserLogin() {
         val auth = SettingsFirebase.getFirebaseAuthOrganizze()
-//        auth.signOut()
         if (auth.currentUser != null) openMajorScream()
     }
 
