@@ -10,13 +10,17 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.adapter.MovementAdapter
 import com.jaques.projetos.organizze.helper.Base64Custom
+import com.jaques.projetos.organizze.model.Movement
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import kotlinx.android.synthetic.main.activity_major.*
@@ -29,6 +33,10 @@ class MajorActivity : AppCompatActivity() {
     private lateinit var textBalance: TextView
 
     private lateinit var databaseListener: ValueEventListener
+    private lateinit var recycleView: RecyclerView
+
+    private lateinit var movementAdapter: MovementAdapter
+    private lateinit var movementList: ArrayList<Movement>
 
     override fun onStart() {
         userData()
@@ -47,7 +55,16 @@ class MajorActivity : AppCompatActivity() {
         textBalance = textView_Balance_Major
         textWelcome = textWelcomeUser_Major
         calendar = calendarView
+        recycleView = RecyclerViewMovement
         settingsCalendar()
+
+//        movementAdapter = MovementAdapter(movementList)
+
+
+        val recyclerViewLayoutManager = LinearLayoutManager(this)
+        recycleView.layoutManager = recyclerViewLayoutManager
+        recycleView.setHasFixedSize(true)
+//        recycleView.adapter = movementAdapter
 
         databaseListener = userData().addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
