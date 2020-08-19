@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -18,7 +17,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
 import com.jaques.projetos.organizze.helper.Base64Custom
@@ -37,15 +35,16 @@ class MajorActivity : AppCompatActivity() {
 
     private lateinit var databaseListenerUser: ValueEventListener
     private lateinit var databaseListenerMove: ValueEventListener
-    private lateinit var recycleView: RecyclerView
 
+    private lateinit var recycleView: RecyclerView
     private lateinit var movementAdapter: MovementAdapter
     private var movementList: ArrayList<Movement> = arrayListOf()
 
-    private val movementRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
+    private lateinit var selectMonthYear: String
+
+    private var movementRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
     private var databaseRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
 
-    private lateinit var selectMonthYear: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +87,21 @@ class MajorActivity : AppCompatActivity() {
                 textBalance.text = "R$ ${decimalFormat.format(totalExtract)}"
                 textWelcome.text = "Olá, ${useNameFirebase.toString()}"
 
+            }
+        })
+        movementRef = movData()
+        databaseListenerMove = movementRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                movementList.clear()
+
+                for (postSnapshot in snapshot.children) {
+                    val movement = postSnapshot.child("category")
+                    Log.i("dateReturn", "Data -> ${movement.value}")
+                }
             }
         })
 
@@ -142,51 +156,24 @@ class MajorActivity : AppCompatActivity() {
     fun addExpense(view: View) =
         startActivity(Intent(this, ExpenseActivity::class.java))
 
-
     fun addRevenue(view: View) =
         startActivity(Intent(this, RevenueActivity::class.java))
 
+    private fun userData(): DatabaseReference =
+        databaseRef.child("users").child(keyUser())
 
-    private fun userData(): DatabaseReference {
+    private fun movData(): DatabaseReference =
+        movementRef.child("movement").child(keyUser()).child(selectMonthYear)
+
+
+    private fun keyUser(): String {
         val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
-        val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
-        return databaseRef.child("users").child(id)
+        return Base64Custom.codeBase64(auth.currentUser!!.email.toString())
     }
-
-    private fun movementData() {
-        val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
-        val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
-        movementRef.child("movement")
-            .child(id)
-            .child(selectMonthYear)
-
-
-        databaseListenerMove = movementRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                movementList.clear()
-                for (postSnapshot in snapshot.children) {
-                    val movement = postSnapshot.value
-
-
-                    Log.i("dateReturn", "Data -> $movement")
-
-
-                }
-
-
-            }
-        })
-    }
-
 
     override fun onStart() {
         userData()
-        movementData()
+        movData()
         Log.i("Evento", "Evento foi iniciado")
         super.onStart()
     }
@@ -199,3 +186,5 @@ class MajorActivity : AppCompatActivity() {
     }
 
 }
+
+
