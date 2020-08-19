@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jaques.projetos.organizze.R
-import com.jaques.projetos.organizze.activity.MajorActivity
 import com.jaques.projetos.organizze.model.Movement
 
 /** author Leonardo Jaques on 18/08/20 */

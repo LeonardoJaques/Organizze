@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -17,11 +18,13 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
 import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.model.Movement
 import com.jaques.projetos.organizze.settings.SettingsFirebase
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import kotlinx.android.synthetic.main.activity_major.*
 import kotlinx.android.synthetic.main.content_major.*
@@ -32,17 +35,17 @@ class MajorActivity : AppCompatActivity() {
     private lateinit var textWelcome: TextView
     private lateinit var textBalance: TextView
 
-    private lateinit var databaseListener: ValueEventListener
+    private lateinit var databaseListenerUser: ValueEventListener
+    private lateinit var databaseListenerMove: ValueEventListener
     private lateinit var recycleView: RecyclerView
 
     private lateinit var movementAdapter: MovementAdapter
-    private lateinit var movementList: ArrayList<Movement>
+    private var movementList: ArrayList<Movement> = arrayListOf()
 
-    override fun onStart() {
-        userData()
-        Log.i("Evento", "Evento foi iniciado")
-        super.onStart()
-    }
+    private val movementRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
+    private var databaseRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
+
+    private lateinit var selectMonthYear: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,21 +55,24 @@ class MajorActivity : AppCompatActivity() {
         toolbar.title = "Organizze"
         setSupportActionBar(toolbar)
 
+
+
         textBalance = textView_Balance_Major
         textWelcome = textWelcomeUser_Major
         calendar = calendarView
         recycleView = RecyclerViewMovement
         settingsCalendar()
 
-//        movementAdapter = MovementAdapter(movementList)
+        movementAdapter = MovementAdapter(movementList)
 
 
         val recyclerViewLayoutManager = LinearLayoutManager(this)
         recycleView.layoutManager = recyclerViewLayoutManager
         recycleView.setHasFixedSize(true)
-//        recycleView.adapter = movementAdapter
+        recycleView.adapter = movementAdapter
 
-        databaseListener = userData().addValueEventListener(object : ValueEventListener {
+        databaseRef = userData()
+        databaseListenerUser = databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
@@ -123,9 +129,12 @@ class MajorActivity : AppCompatActivity() {
                 "S", "S", "D"
             )
         )
+        val dateCurrent: CalendarDay = calendar.currentDate
 
-        calendar.setOnMonthChangedListener { widget, date ->
-            Log.i("data:", " Valor 1:${date.month}/${date.year}")
+        selectMonthYear =
+            ("${String.format("%02d", dateCurrent.month)}${dateCurrent.year}").toString()
+        calendar.setOnMonthChangedListener { _, date ->
+            selectMonthYear = ("${String.format("%02d", date.month)}${date.year}").toString()
         }
     }
 
@@ -139,15 +148,52 @@ class MajorActivity : AppCompatActivity() {
 
 
     private fun userData(): DatabaseReference {
-        val database = SettingsFirebase.getFirebaseRefenceOrganizze().reference
         val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
         val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
-        val dataBaseListener = database.child("users").child(id)
-        return dataBaseListener
+        return databaseRef.child("users").child(id)
+    }
+
+    private fun movementData() {
+        val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
+        val id = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
+        movementRef.child("movement")
+            .child(id)
+            .child(selectMonthYear)
+
+
+        databaseListenerMove = movementRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                movementList.clear()
+                for (postSnapshot in snapshot.children) {
+                    val movement = postSnapshot.value
+
+
+                    Log.i("dateReturn", "Data -> $movement")
+
+
+                }
+
+
+            }
+        })
+    }
+
+
+    override fun onStart() {
+        userData()
+        movementData()
+        Log.i("Evento", "Evento foi iniciado")
+        super.onStart()
     }
 
     override fun onStop() {
-        userData().removeEventListener(databaseListener)
+        databaseRef.removeEventListener(databaseListenerUser)
+        movementRef.removeEventListener(databaseListenerMove)
         Log.i("Evento", "Evento foi removido")
         super.onStop()
     }
