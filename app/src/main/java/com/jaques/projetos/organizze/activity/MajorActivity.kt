@@ -10,12 +10,12 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
 import com.jaques.projetos.organizze.model.Movement
@@ -24,9 +24,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import kotlinx.android.synthetic.main.activity_major.*
 import kotlinx.android.synthetic.main.content_major.*
-import java.lang.Double.parseDouble
-import java.util.logging.Level.parse
-import kotlin.math.absoluteValue
+
 
 class MajorActivity : AppCompatActivity() {
 
@@ -54,22 +52,49 @@ class MajorActivity : AppCompatActivity() {
         toolbar.title = "Organizze"
         setSupportActionBar(toolbar)
 
-
-
         textBalance = textView_Balance_Major
         textWelcome = textWelcomeUser_Major
         calendar = calendarView
         recycleView = RecyclerViewMovement
         settingsCalendar()
+        swipe()
+
 
         movementAdapter = MovementAdapter(movementList)
-
 
         val recyclerViewLayoutManager = LinearLayoutManager(this)
         recycleView.layoutManager = recyclerViewLayoutManager
         recycleView.setHasFixedSize(true)
         recycleView.adapter = movementAdapter
 
+    }
+
+    private fun swipe() {
+        val itemTouch = object : ItemTouchHelper.Callback() {
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+
+                val dragFlags = ItemTouchHelper.ACTION_STATE_IDLE
+                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+                return makeMovementFlags(dragFlags, swipeFlags)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                Log.i("Swipe", "Item foi arratado")
+            }
+
+        }
+        ItemTouchHelper(itemTouch).attachToRecyclerView(recycleView)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
