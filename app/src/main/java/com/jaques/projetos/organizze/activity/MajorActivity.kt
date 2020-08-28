@@ -12,20 +12,21 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
-import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.model.Movement
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import kotlinx.android.synthetic.main.activity_major.*
 import kotlinx.android.synthetic.main.content_major.*
+import java.lang.Double.parseDouble
+import java.util.logging.Level.parse
+import kotlin.math.absoluteValue
 
 class MajorActivity : AppCompatActivity() {
 
@@ -42,8 +43,7 @@ class MajorActivity : AppCompatActivity() {
 
     private lateinit var selectMonthYear: String
 
-    private var movementRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
-    private var databaseRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
+    private var firebaseRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,41 +69,6 @@ class MajorActivity : AppCompatActivity() {
         recycleView.layoutManager = recyclerViewLayoutManager
         recycleView.setHasFixedSize(true)
         recycleView.adapter = movementAdapter
-
-        databaseRef = userData()
-        databaseListenerUser = databaseRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val useNameFirebase = snapshot.child("name").value
-                val totalExpense = snapshot.child("totalExpense").value.toString().toDouble()
-                val totalRevenue = snapshot.child("totalRevenue").value.toString().toDouble()
-                val totalExtract = totalRevenue - totalExpense
-
-                val decimalFormat = DecimalFormat("0.00")
-
-                textBalance.text = "R$ ${decimalFormat.format(totalExtract)}"
-                textWelcome.text = "Olá, ${useNameFirebase.toString()}"
-
-            }
-        })
-        movementRef = movData()
-        databaseListenerMove = movementRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                movementList.clear()
-
-                for (postSnapshot in snapshot.children) {
-                    val movement = postSnapshot.child("category")
-                    Log.i("dateReturn", "Data -> ${movement.value}")
-                }
-            }
-        })
 
     }
 
@@ -137,18 +102,14 @@ class MajorActivity : AppCompatActivity() {
             )
         )
 
-        calendar.setWeekDayLabels(
-            arrayOf<CharSequence>(
-                "S", "T", "Q", "Q",
-                "S", "S", "D"
-            )
-        )
         val dateCurrent: CalendarDay = calendar.currentDate
 
         selectMonthYear =
             ("${String.format("%02d", dateCurrent.month)}${dateCurrent.year}").toString()
         calendar.setOnMonthChangedListener { _, date ->
             selectMonthYear = ("${String.format("%02d", date.month)}${date.year}").toString()
+            firebaseRef.removeEventListener(databaseListenerMove)
+            movData()
         }
     }
 
@@ -159,17 +120,61 @@ class MajorActivity : AppCompatActivity() {
     fun addRevenue(view: View) =
         startActivity(Intent(this, RevenueActivity::class.java))
 
-    private fun userData(): DatabaseReference =
-        databaseRef.child("users").child(keyUser())
+    private fun userData() {
+        val userDataRef = firebaseRef.child("users").child(SettingsFirebase.id())
+        Log.i("Firebase", "GetPath -> $userDataRef")
+        databaseListenerUser = userDataRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
 
-    private fun movData(): DatabaseReference =
-        movementRef.child("movement").child(keyUser()).child(selectMonthYear)
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val useNameFirebase = snapshot.child("name").value
+                val totalExpense = snapshot.child("totalExpense").value
+                val totalRevenue = snapshot.child("totalRevenue").value
+                val totalExtract =
+                    totalRevenue.toString().toDouble() - totalExpense.toString().toDouble()
 
+                val decimalFormat = DecimalFormat("0.00")
+                val value = decimalFormat.format(totalExtract).toString()
+                textBalance.text = "R$ ${value}"
+//                textBalance.text = "R$ ${totalExtract.absoluteValue}"
+                textWelcome.text = "Olá, ${useNameFirebase.toString()}"
+            }
+        })
 
-    private fun keyUser(): String {
-        val auth: FirebaseAuth = SettingsFirebase.getFirebaseAuthOrganizze()
-        return Base64Custom.codeBase64(auth.currentUser!!.email.toString())
     }
+
+
+    private fun movData() {
+        val movDataRef =
+            firebaseRef.child("movement").child(SettingsFirebase.id()).child(selectMonthYear)
+        Log.i("Firebase", "GetPath -> $movDataRef")
+        databaseListenerMove = movDataRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                movementList.clear()
+
+                for (postSnapshot in snapshot.children) {
+                    val date = postSnapshot.child("date").value.toString()
+                    val category = postSnapshot.child("category").value.toString()
+                    val description = postSnapshot.child("description").value.toString()
+                    val type = postSnapshot.child("type").value.toString()
+                    val value = postSnapshot.child("value").value.toString()
+
+                    val movement = Movement(date, category, description, type, value)
+
+                    Log.i("Firebase", "GetFirebase -> ${value}")
+                    movementList.add(movement)
+                }
+                movementAdapter.notifyDataSetChanged()
+            }
+        })
+    }
+
 
     override fun onStart() {
         userData()
@@ -179,11 +184,12 @@ class MajorActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        databaseRef.removeEventListener(databaseListenerUser)
-        movementRef.removeEventListener(databaseListenerMove)
+        firebaseRef.removeEventListener(databaseListenerUser)
+        firebaseRef.removeEventListener(databaseListenerMove)
         Log.i("Evento", "Evento foi removido")
         super.onStop()
     }
+
 
 }
 

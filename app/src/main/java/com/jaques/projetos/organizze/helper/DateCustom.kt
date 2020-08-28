@@ -1,5 +1,6 @@
 package com.jaques.projetos.organizze.helper
 
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,11 +19,13 @@ class DateCustom {
 
         fun dateChoose(date: String): String {
             val returnDate = date.split("/")
-            val day = returnDate[0]
+//            val day = returnDate[0]
             val month = returnDate[1]
             val year = returnDate[2]
             return month + year
         }
+
+
     }
 
 }

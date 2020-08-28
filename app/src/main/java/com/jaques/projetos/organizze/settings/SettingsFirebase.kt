@@ -1,10 +1,9 @@
 package com.jaques.projetos.organizze.settings
 
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.*
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.jaques.projetos.organizze.helper.Base64Custom
@@ -19,11 +18,16 @@ class SettingsFirebase {
             return auth
         }
 
+        fun getFirebaseRefenceOrganizze(): FirebaseDatabase = Firebase.database
+        fun id() = Base64Custom.codeBase64(auth.currentUser!!.email.toString())
 
-        fun getFirebaseRefenceOrganizze(): FirebaseDatabase {
-            return Firebase.database
-        }
+        fun movPath() = getFirebaseRefenceOrganizze().getReference("movement")
+        fun userPath() = getFirebaseRefenceOrganizze().getReference("users")
 
+
+        fun fireBaseRef() = getFirebaseRefenceOrganizze().reference
 
     }
+
+
 }
