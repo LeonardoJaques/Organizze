@@ -3,40 +3,30 @@ package com.jaques.projetos.organizze.activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.databinding.ActivityRevenueBinding
 import com.jaques.projetos.organizze.helper.DateCustom
 import com.jaques.projetos.organizze.model.Movement
 import com.jaques.projetos.organizze.settings.SettingsFirebase
-import kotlinx.android.synthetic.main.activity_revenue.*
 
 class RevenueActivity : AppCompatActivity() {
 
-    private lateinit var fieldDate: TextInputEditText
-    private lateinit var fieldCategory: TextInputEditText
-    private lateinit var fieldDescription: TextInputEditText
-    private lateinit var fieldValue: EditText
+    private lateinit var binding: ActivityRevenueBinding
 
     private var totalRevenue: Double = 0.00
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_revenue)
+        binding = ActivityRevenueBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        fieldValue = editViewRevenueValue
-        fieldDate = editViewDateRevenue
-        fieldCategory = editViewEntryR
-        fieldDescription = editViewDescriptionR
-
-        fieldDate.setText(DateCustom.dateCurrent())
+        binding.editViewDateRevenue.setText(DateCustom.dateCurrent())
         getRevenueTotal()
 
     }
@@ -44,10 +34,10 @@ class RevenueActivity : AppCompatActivity() {
 
     fun saveRevenue(view: View) {
         if (validateFieldsRevenue()) {
-            val date: String = fieldDate.text.toString()
-            val value = fieldValue.text.toString().toDouble()
-            val category = fieldCategory.text.toString()
-            val description = fieldDescription.text.toString()
+            val date: String = binding.editViewDateRevenue.text.toString()
+            val value = binding.editViewRevenueValue.text.toString().toDouble()
+            val category = binding.editViewEntryR.text.toString()
+            val description = binding.editViewDescriptionR.text.toString()
             val type = "r"
 
             save(date, category, description, type, value)
@@ -102,22 +92,22 @@ class RevenueActivity : AppCompatActivity() {
 
     private fun validateFieldsRevenue(): Boolean {
         when {
-            fieldCategory.text!!.isEmpty() -> Toast.makeText(
+            binding.editViewEntryR.text!!.isEmpty() -> Toast.makeText(
                 this,
                 "Preecha a Categoria",
                 Toast.LENGTH_LONG
             ).show()
-            fieldDescription.text!!.isEmpty() -> Toast.makeText(
+            binding.editViewDescriptionR.text!!.isEmpty() -> Toast.makeText(
                 this,
                 "Preecha a Descrição",
                 Toast.LENGTH_LONG
             ).show()
-            fieldValue.text.toString().isEmpty() -> Toast.makeText(
+            binding.editViewRevenueValue.text.toString().isEmpty() -> Toast.makeText(
                 this,
                 "Preecha o valor",
                 Toast.LENGTH_LONG
             ).show()
-            fieldDate.text.toString().isEmpty() -> fieldDate.setText(DateCustom.dateCurrent())
+            binding.editViewDateRevenue.text.toString().isEmpty() -> binding.editViewDateRevenue.setText(DateCustom.dateCurrent())
             else -> return true
         }
 

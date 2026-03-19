@@ -2,8 +2,6 @@ package com.jaques.projetos.organizze.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -11,36 +9,28 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.databinding.ActivityRegisterBinding
 import com.jaques.projetos.organizze.helper.Base64Custom
 import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
-import kotlinx.android.synthetic.main.activity_register.*
 
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var fieldName: EditText
-    private lateinit var fieldEmail: EditText
-    private lateinit var fieldPassword: EditText
-    private lateinit var buttonRegister: Button
+    private lateinit var binding: ActivityRegisterBinding
     private lateinit var userOgzz: UserOgzz
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar!!.title = "Cadastro"
 
-        fieldName = editName
-        fieldEmail = editEmail
-        fieldPassword = editPassword
-        buttonRegister = buttonRegisterView
-
-
-        buttonRegister.setOnClickListener {
-            val textName = fieldName.text.toString()
-            val textEmail = fieldEmail.text.toString()
-            val textPassword = fieldPassword.text.toString()
+        binding.buttonRegisterView.setOnClickListener {
+            val textName = binding.editName.text.toString()
+            val textEmail = binding.editEmail.text.toString()
+            val textPassword = binding.editPassword.text.toString()
 
             when {
                 textName.isEmpty() -> Toast.makeText(

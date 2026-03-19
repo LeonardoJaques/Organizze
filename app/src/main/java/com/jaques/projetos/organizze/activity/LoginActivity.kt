@@ -3,34 +3,28 @@ package com.jaques.projetos.organizze.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.*
 
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.databinding.ActivityLoginBinding
 import com.jaques.projetos.organizze.model.UserOgzz
 import com.jaques.projetos.organizze.settings.SettingsFirebase
-import kotlinx.android.synthetic.main.activity_login.*
 
-private lateinit var fieldEmailLogin: EditText
-private lateinit var fieldPasswordLogin: EditText
-private lateinit var btEnterLogin: Button
-internal lateinit var userOgzz: UserOgzz
+private lateinit var userOgzz: UserOgzz
 
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        fieldEmailLogin = editEmailLogin
-        fieldPasswordLogin = editPasswordLogin
-        btEnterLogin = buttonEnterLogin
-
-        btEnterLogin.setOnClickListener {
-            val textEmail = fieldEmailLogin.text.toString()
-            val textPassword = fieldPasswordLogin.text.toString()
+        binding.buttonEnterLogin.setOnClickListener {
+            val textEmail = binding.editEmailLogin.text.toString()
+            val textPassword = binding.editPasswordLogin.text.toString()
 
             when {
                 textEmail.isEmpty() -> Toast.makeText(

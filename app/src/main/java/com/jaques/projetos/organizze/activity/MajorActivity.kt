@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -18,24 +17,22 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
+import com.jaques.projetos.organizze.databinding.ActivityMajorBinding
+import com.jaques.projetos.organizze.databinding.ContentMajorBinding
 import com.jaques.projetos.organizze.model.Movement
 import com.jaques.projetos.organizze.settings.SettingsFirebase
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
-import kotlinx.android.synthetic.main.activity_major.*
-import kotlinx.android.synthetic.main.content_major.*
 
 
 class MajorActivity : AppCompatActivity() {
 
-    private lateinit var calendar: MaterialCalendarView
-    private lateinit var textWelcome: TextView
-    private lateinit var textBalance: TextView
+    private lateinit var binding: ActivityMajorBinding
+    private lateinit var contentBinding: ContentMajorBinding
 
     private lateinit var databaseListenerUser: ValueEventListener
     private lateinit var databaseListenerMove: ValueEventListener
 
-    private lateinit var recycleView: RecyclerView
     private lateinit var movementAdapter: MovementAdapter
     private var movementList: ArrayList<Movement> = arrayListOf()
 
@@ -46,16 +43,13 @@ class MajorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_major)
+        binding = ActivityMajorBinding.inflate(layoutInflater)
+        contentBinding = ContentMajorBinding.bind(binding.root)
+        setContentView(binding.root)
 
-        val toolbar = toolbarView
-        toolbar.title = "Organizze"
-        setSupportActionBar(toolbar)
+        binding.toolbarView.title = "Organizze"
+        setSupportActionBar(binding.toolbarView)
 
-        textBalance = textView_Balance_Major
-        textWelcome = textWelcomeUser_Major
-        calendar = calendarView
-        recycleView = RecyclerViewMovement
         settingsCalendar()
         swipe()
 
@@ -63,9 +57,9 @@ class MajorActivity : AppCompatActivity() {
         movementAdapter = MovementAdapter(movementList)
 
         val recyclerViewLayoutManager = LinearLayoutManager(this)
-        recycleView.layoutManager = recyclerViewLayoutManager
-        recycleView.setHasFixedSize(true)
-        recycleView.adapter = movementAdapter
+        contentBinding.RecyclerViewMovement.layoutManager = recyclerViewLayoutManager
+        contentBinding.RecyclerViewMovement.setHasFixedSize(true)
+        contentBinding.RecyclerViewMovement.adapter = movementAdapter
 
     }
 
@@ -94,7 +88,7 @@ class MajorActivity : AppCompatActivity() {
             }
 
         }
-        ItemTouchHelper(itemTouch).attachToRecyclerView(recycleView)
+        ItemTouchHelper(itemTouch).attachToRecyclerView(contentBinding.RecyclerViewMovement)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -119,7 +113,7 @@ class MajorActivity : AppCompatActivity() {
 
     private fun settingsCalendar() {
 
-        calendar.setTitleMonths(
+        contentBinding.calendarView.setTitleMonths(
             arrayOf<CharSequence>(
                 "Janeiro", "Fevereiro", "Março", "Abril", "Maio",
                 "Junho", "Julho", "Agosto", "Setembro", "Outubro",
@@ -127,11 +121,11 @@ class MajorActivity : AppCompatActivity() {
             )
         )
 
-        val dateCurrent: CalendarDay = calendar.currentDate
+        val dateCurrent: CalendarDay = contentBinding.calendarView.currentDate
 
         selectMonthYear =
             ("${String.format("%02d", dateCurrent.month)}${dateCurrent.year}").toString()
-        calendar.setOnMonthChangedListener { _, date ->
+        contentBinding.calendarView.setOnMonthChangedListener { _, date ->
             selectMonthYear = ("${String.format("%02d", date.month)}${date.year}").toString()
             firebaseRef.removeEventListener(databaseListenerMove)
             movData()
@@ -162,9 +156,9 @@ class MajorActivity : AppCompatActivity() {
 
                 val decimalFormat = DecimalFormat("0.00")
                 val value = decimalFormat.format(totalExtract).toString()
-                textBalance.text = "R$ ${value}"
-//                textBalance.text = "R$ ${totalExtract.absoluteValue}"
-                textWelcome.text = "Olá, ${useNameFirebase.toString()}"
+                contentBinding.textViewBalanceMajor.text = "R$ ${value}"
+//                contentBinding.textViewBalanceMajor.text = "R$ ${totalExtract.absoluteValue}"
+                contentBinding.textWelcomeUserMajor.text = "Olá, ${useNameFirebase.toString()}"
             }
         })
 
