@@ -4,114 +4,71 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.jaques.projetos.organizze.R
+import androidx.lifecycle.lifecycleScope
 import com.jaques.projetos.organizze.databinding.ActivityRevenueBinding
+import com.jaques.projetos.organizze.helper.DatabaseHelper
 import com.jaques.projetos.organizze.helper.DateCustom
+import com.jaques.projetos.organizze.helper.SessionManager
 import com.jaques.projetos.organizze.model.Movement
-import com.jaques.projetos.organizze.settings.SettingsFirebase
+import com.jaques.projetos.organizze.model.MovementType
+import com.jaques.projetos.organizze.repository.MovementRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RevenueActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRevenueBinding
-
-    private var totalRevenue: Double = 0.00
-
+    private lateinit var movementRepository: MovementRepository
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRevenueBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val db = DatabaseHelper.getInstance(this)
+        movementRepository = MovementRepository(db)
+        sessionManager = SessionManager(this)
+
         binding.editViewDateRevenue.setText(DateCustom.dateCurrent())
-        getRevenueTotal()
-
     }
-
 
     fun saveRevenue(view: View) {
-        if (validateFieldsRevenue()) {
-            val date: String = binding.editViewDateRevenue.text.toString()
-            val value = binding.editViewRevenueValue.text.toString().toDouble()
-            val category = binding.editViewEntryR.text.toString()
-            val description = binding.editViewDescriptionR.text.toString()
-            val type = "r"
+        if (!validateFields()) return
 
-            save(date, category, description, type, value)
-        } else validateFieldsRevenue()
-    }
+        val date = binding.editViewDateRevenue.text.toString()
+        val movement = Movement(
+            date = date,
+            value = binding.editViewRevenueValue.text.toString().toDouble(),
+            category = binding.editViewEntryR.text.toString(),
+            description = binding.editViewDescriptionR.text.toString(),
+            type = MovementType.REVENUE
+        )
 
-    private fun getRevenueTotal(): Double {
-        userData().addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                movementRepository.save(sessionManager.getUserId(), movement, DateCustom.dateChoose(date))
             }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val expenseDb = snapshot.value
-                totalRevenue = expenseDb.toString().toDouble()
-            }
-        })
-        return totalRevenue
-    }
-
-    private fun userData(): DatabaseReference {
-        val id = SettingsFirebase.id()
-        return SettingsFirebase.fireBaseRef().child("users")
-            .child(id)
-            .child("totalRevenue")
-    }
-
-    private fun save(
-        date: String?,
-        category: String,
-        description: String,
-        type: String,
-        value: Double
-    ) {
-        val monthYear: String? = date?.let { DateCustom.dateChoose(it) }
-
-        val firebase: DatabaseReference = SettingsFirebase.movPath()
-        val userId = SettingsFirebase.id()
-        if (monthYear != null) {
-            val firebaseAttributes = firebase.child(userId).child(monthYear).push()
-            firebaseAttributes.child("date").setValue(date)
-            firebaseAttributes.child("category").setValue(category)
-            firebaseAttributes.child("description").setValue(description)
-            firebaseAttributes.child("type").setValue(type)
-            firebaseAttributes.child("value").setValue(value)
-
-            val updateValue = value + totalRevenue
-            userData().setValue(updateValue)
             finish()
         }
     }
 
-    private fun validateFieldsRevenue(): Boolean {
-        when {
-            binding.editViewEntryR.text!!.isEmpty() -> Toast.makeText(
-                this,
-                "Preecha a Categoria",
-                Toast.LENGTH_LONG
-            ).show()
-            binding.editViewDescriptionR.text!!.isEmpty() -> Toast.makeText(
-                this,
-                "Preecha a Descrição",
-                Toast.LENGTH_LONG
-            ).show()
-            binding.editViewRevenueValue.text.toString().isEmpty() -> Toast.makeText(
-                this,
-                "Preecha o valor",
-                Toast.LENGTH_LONG
-            ).show()
-            binding.editViewDateRevenue.text.toString().isEmpty() -> binding.editViewDateRevenue.setText(DateCustom.dateCurrent())
-            else -> return true
+    private fun validateFields(): Boolean {
+        with(binding) {
+            return when {
+                editViewEntryR.text.isNullOrEmpty() -> { showToast("Preencha a Categoria"); false }
+                editViewDescriptionR.text.isNullOrEmpty() -> { showToast("Preencha a Descrição"); false }
+                editViewRevenueValue.text.toString().isEmpty() -> { showToast("Preencha o valor"); false }
+                editViewDateRevenue.text.toString().isEmpty() -> { editViewDateRevenue.setText(DateCustom.dateCurrent()); false }
+                else -> true
+            }
         }
-
-        return false
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
 }

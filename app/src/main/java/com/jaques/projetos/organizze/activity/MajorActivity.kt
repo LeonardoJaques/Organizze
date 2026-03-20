@@ -1,215 +1,153 @@
 package com.jaques.projetos.organizze.activity
 
 import android.content.Intent
-import android.icu.text.DecimalFormat
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.jaques.projetos.organizze.R
 import com.jaques.projetos.organizze.adapter.MovementAdapter
 import com.jaques.projetos.organizze.databinding.ActivityMajorBinding
 import com.jaques.projetos.organizze.databinding.ContentMajorBinding
+import com.jaques.projetos.organizze.helper.DatabaseHelper
+import com.jaques.projetos.organizze.helper.SessionManager
+import com.jaques.projetos.organizze.helper.toBRL
 import com.jaques.projetos.organizze.model.Movement
-import com.jaques.projetos.organizze.settings.SettingsFirebase
+import com.jaques.projetos.organizze.repository.MovementRepository
+import com.jaques.projetos.organizze.repository.UserRepository
 import com.prolificinteractive.materialcalendarview.CalendarDay
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MajorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMajorBinding
     private lateinit var contentBinding: ContentMajorBinding
-
-    private lateinit var databaseListenerUser: ValueEventListener
-    private lateinit var databaseListenerMove: ValueEventListener
+    private lateinit var sessionManager: SessionManager
+    private lateinit var userRepository: UserRepository
+    private lateinit var movementRepository: MovementRepository
 
     private lateinit var movementAdapter: MovementAdapter
-    private var movementList: ArrayList<Movement> = arrayListOf()
+    private val movementList = mutableListOf<Movement>()
 
-    private lateinit var selectMonthYear: String
-
-    private var firebaseRef = SettingsFirebase.getFirebaseRefenceOrganizze().reference
-
+    private lateinit var selectedMonthYear: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMajorBinding.inflate(layoutInflater)
-        contentBinding = ContentMajorBinding.bind(binding.root)
+        contentBinding = binding.contentMajor
         setContentView(binding.root)
+
+        val db = DatabaseHelper.getInstance(this)
+        sessionManager = SessionManager(this)
+        userRepository = UserRepository(db)
+        movementRepository = MovementRepository(db)
 
         binding.toolbarView.title = "Organizze"
         setSupportActionBar(binding.toolbarView)
 
-        settingsCalendar()
-        swipe()
-
-
-        movementAdapter = MovementAdapter(movementList)
-
-        val recyclerViewLayoutManager = LinearLayoutManager(this)
-        contentBinding.RecyclerViewMovement.layoutManager = recyclerViewLayoutManager
-        contentBinding.RecyclerViewMovement.setHasFixedSize(true)
-        contentBinding.RecyclerViewMovement.adapter = movementAdapter
-
+        setupCalendar()
+        setupRecyclerView()
+        setupSwipeToDelete()
     }
 
-    private fun swipe() {
-        val itemTouch = object : ItemTouchHelper.Callback() {
-            override fun getMovementFlags(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ): Int {
+    private fun setupRecyclerView() {
+        movementAdapter = MovementAdapter(movementList)
+        contentBinding.RecyclerViewMovement.apply {
+            layoutManager = LinearLayoutManager(this@MajorActivity)
+            setHasFixedSize(true)
+            adapter = movementAdapter
+        }
+    }
 
-                val dragFlags = ItemTouchHelper.ACTION_STATE_IDLE
-                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
-                return makeMovementFlags(dragFlags, swipeFlags)
-            }
-
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
+    private fun setupSwipeToDelete() {
+        val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START or ItemTouchHelper.END) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                Log.i("Swipe", "Item foi arratado")
-            }
+                val position = viewHolder.adapterPosition
+                val movement = movementList[position]
+                val userId = sessionManager.getUserId()
 
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        movementRepository.delete(userId, movement)
+                    }
+                    movementList.removeAt(position)
+                    movementAdapter.notifyItemRemoved(position)
+                    loadUserData()
+                    Toast.makeText(this@MajorActivity, "Removido", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-        ItemTouchHelper(itemTouch).attachToRecyclerView(contentBinding.RecyclerViewMovement)
+        ItemTouchHelper(callback).attachToRecyclerView(contentBinding.RecyclerViewMovement)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_major, menu)
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menuSignout -> {
-                SettingsFirebase.getFirebaseAuthOrganizze().signOut()
-                Toast.makeText(this, "Deslogado com sucesso", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }
-
+        if (item.itemId == R.id.menuSignout) {
+            sessionManager.logout()
+            Toast.makeText(this, "Deslogado com sucesso", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return true
         }
-
         return super.onOptionsItemSelected(item)
     }
 
-
-    private fun settingsCalendar() {
-
-        contentBinding.calendarView.setTitleMonths(
-            arrayOf<CharSequence>(
-                "Janeiro", "Fevereiro", "Março", "Abril", "Maio",
-                "Junho", "Julho", "Agosto", "Setembro", "Outubro",
-                "Novembro", "Dezembro"
-            )
+    private fun setupCalendar() {
+        val months = arrayOf<CharSequence>(
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio",
+            "Junho", "Julho", "Agosto", "Setembro", "Outubro",
+            "Novembro", "Dezembro"
         )
+        contentBinding.calendarView.setTitleMonths(months)
 
-        val dateCurrent: CalendarDay = contentBinding.calendarView.currentDate
+        val current: CalendarDay = contentBinding.calendarView.currentDate
+        selectedMonthYear = "%02d%d".format(current.month, current.year)
 
-        selectMonthYear =
-            ("${String.format("%02d", dateCurrent.month)}${dateCurrent.year}").toString()
         contentBinding.calendarView.setOnMonthChangedListener { _, date ->
-            selectMonthYear = ("${String.format("%02d", date.month)}${date.year}").toString()
-            firebaseRef.removeEventListener(databaseListenerMove)
-            movData()
+            selectedMonthYear = "%02d%d".format(date.month, date.year)
+            loadMovements()
         }
     }
 
+    fun addExpense(view: View) = startActivity(Intent(this, ExpenseActivity::class.java))
+    fun addRevenue(view: View) = startActivity(Intent(this, RevenueActivity::class.java))
 
-    fun addExpense(view: View) =
-        startActivity(Intent(this, ExpenseActivity::class.java))
-
-    fun addRevenue(view: View) =
-        startActivity(Intent(this, RevenueActivity::class.java))
-
-    private fun userData() {
-        val userDataRef = firebaseRef.child("users").child(SettingsFirebase.id())
-        Log.i("Firebase", "GetPath -> $userDataRef")
-        databaseListenerUser = userDataRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val useNameFirebase = snapshot.child("name").value
-                val totalExpense = snapshot.child("totalExpense").value
-                val totalRevenue = snapshot.child("totalRevenue").value
-                val totalExtract =
-                    totalRevenue.toString().toDouble() - totalExpense.toString().toDouble()
-
-                val decimalFormat = DecimalFormat("0.00")
-                val value = decimalFormat.format(totalExtract).toString()
-                contentBinding.textViewBalanceMajor.text = "R$ ${value}"
-//                contentBinding.textViewBalanceMajor.text = "R$ ${totalExtract.absoluteValue}"
-                contentBinding.textWelcomeUserMajor.text = "Olá, ${useNameFirebase.toString()}"
-            }
-        })
-
+    private fun loadUserData() {
+        lifecycleScope.launch {
+            val user = withContext(Dispatchers.IO) {
+                userRepository.getUser(sessionManager.getUserId())
+            } ?: return@launch
+            contentBinding.textViewBalanceMajor.text = user.balance.toBRL()
+            contentBinding.textWelcomeUserMajor.text = "Olá, ${user.name}"
+        }
     }
 
-
-    private fun movData() {
-        val movDataRef =
-            firebaseRef.child("movement").child(SettingsFirebase.id()).child(selectMonthYear)
-        Log.i("Firebase", "GetPath -> $movDataRef")
-        databaseListenerMove = movDataRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+    private fun loadMovements() {
+        lifecycleScope.launch {
+            val movements = withContext(Dispatchers.IO) {
+                movementRepository.getByMonthYear(sessionManager.getUserId(), selectedMonthYear)
             }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                movementList.clear()
-
-                for (postSnapshot in snapshot.children) {
-                    val date = postSnapshot.child("date").value.toString()
-                    val category = postSnapshot.child("category").value.toString()
-                    val description = postSnapshot.child("description").value.toString()
-                    val type = postSnapshot.child("type").value.toString()
-                    val value = postSnapshot.child("value").value.toString()
-
-                    val movement = Movement(date, category, description, type, value)
-
-                    Log.i("Firebase", "GetFirebase -> ${value}")
-                    movementList.add(movement)
-                }
-                movementAdapter.notifyDataSetChanged()
-            }
-        })
+            movementAdapter.submitList(movements)
+        }
     }
-
 
     override fun onStart() {
-        userData()
-        movData()
-        Log.i("Evento", "Evento foi iniciado")
         super.onStart()
+        loadUserData()
+        loadMovements()
     }
-
-    override fun onStop() {
-        firebaseRef.removeEventListener(databaseListenerUser)
-        firebaseRef.removeEventListener(databaseListenerMove)
-        Log.i("Evento", "Evento foi removido")
-        super.onStop()
-    }
-
-
 }
-
-

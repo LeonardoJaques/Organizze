@@ -12,16 +12,24 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.ExpenseActivity"
-            android:theme="@style/expenseTheme" />
+            android:parentActivityName=".activity.MajorActivity"
+            android:theme="@style/expenseTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.RevenueActivity"
-            android:theme="@style/revenueTheme" />
+            android:parentActivityName=".activity.MajorActivity"
+            android:theme="@style/revenueTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.MajorActivity"
             android:label="@string/title_activity_major"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.LoginActivity" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.MainActivity"
             android:theme="@style/Theme.Intro"

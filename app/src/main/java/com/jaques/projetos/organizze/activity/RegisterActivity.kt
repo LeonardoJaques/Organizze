@@ -4,106 +4,69 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.FirebaseUser
-import com.jaques.projetos.organizze.R
+import androidx.lifecycle.lifecycleScope
 import com.jaques.projetos.organizze.databinding.ActivityRegisterBinding
-import com.jaques.projetos.organizze.helper.Base64Custom
-import com.jaques.projetos.organizze.model.UserOgzz
-import com.jaques.projetos.organizze.settings.SettingsFirebase
-
+import com.jaques.projetos.organizze.helper.DatabaseHelper
+import com.jaques.projetos.organizze.helper.SessionManager
+import com.jaques.projetos.organizze.model.AuthResult
+import com.jaques.projetos.organizze.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var userOgzz: UserOgzz
-
+    private lateinit var userRepository: UserRepository
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar!!.title = "Cadastro"
 
-        binding.buttonRegisterView.setOnClickListener {
-            val textName = binding.editName.text.toString()
-            val textEmail = binding.editEmail.text.toString()
-            val textPassword = binding.editPassword.text.toString()
+        supportActionBar?.title = "Cadastro"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-            when {
-                textName.isEmpty() -> Toast.makeText(
-                    this,
-                    "Preencha o nome!",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-                textEmail.isEmpty() -> Toast.makeText(
-                    this,
-                    "Preencha o email!",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-                textPassword.isEmpty() -> Toast.makeText(
-                    this,
-                    "Preencha a senha!",
-                    Toast.LENGTH_LONG
-                ).show()
-                else -> {
-                    userOgzz = UserOgzz(textName, textEmail, textPassword)
-                    registerUser()
+        val db = DatabaseHelper.getInstance(this)
+        userRepository = UserRepository(db)
+        sessionManager = SessionManager(this)
+
+        binding.buttonRegisterView.setOnClickListener { handleRegister() }
+    }
+
+    private fun handleRegister() {
+        val name = binding.editName.text.toString().trim()
+        val email = binding.editEmail.text.toString().trim()
+        val password = binding.editPassword.text.toString()
+
+        when {
+            name.isEmpty() -> showToast("Preencha o nome!")
+            email.isEmpty() -> showToast("Preencha o email!")
+            password.isEmpty() -> showToast("Preencha a senha!")
+            password.length < 6 -> showToast("Digite uma senha mais forte!")
+            else -> {
+                binding.buttonRegisterView.isEnabled = false
+                lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        userRepository.register(name, email, password)
+                    }
+                    binding.buttonRegisterView.isEnabled = true
+                    when (result) {
+                        is AuthResult.Success -> {
+                            sessionManager.createSession(result.user.id)
+                            showToast("Cadastrado com sucesso!")
+                            startActivity(Intent(this@RegisterActivity, MajorActivity::class.java))
+                            finish()
+                        }
+                        is AuthResult.Error -> showToast(result.message)
+                    }
                 }
             }
         }
     }
 
-
-    private fun registerUser() {
-        val auth = SettingsFirebase.getFirebaseAuthOrganizze()
-        auth.createUserWithEmailAndPassword(userOgzz.email, userOgzz.password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    val user = auth.currentUser
-                    updateUI(user)
-                    userOgzz.saveUserOgzz()
-
-                } else {
-                    var exception = ""
-                    try {
-                        throw task.exception!!
-                    } catch (e: FirebaseAuthWeakPasswordException) {
-                        exception = "Digite uma senha mais forte!"
-                    } catch (e: FirebaseAuthInvalidCredentialsException) {
-                        exception = "Por favor, digite um e-mail válido"
-                    } catch (e: FirebaseAuthUserCollisionException) {
-                        exception = "Essa conta já foi cadastrada"
-                    } catch (e: Exception) {
-                        exception = "Erro ao cadastrar o usuário ${e.message}"
-                        e.printStackTrace()
-                    }
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(
-                        baseContext, exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateUI(null)
-                }
-            }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
-
-    private fun updateUI(user: FirebaseUser?) {
-        Toast.makeText(this, "Usuario cadastrado com sucesso", Toast.LENGTH_LONG).show()
-        openMajorScream()
-    }
-
-    private fun openMajorScream() {
-        startActivity(Intent(this, MajorActivity::class.java))
-        finish()
-    }
-
-
 }
-
-

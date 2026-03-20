@@ -1,51 +1,81 @@
 package com.jaques.projetos.organizze.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jaques.projetos.organizze.R
+import com.jaques.projetos.organizze.databinding.AdapterMovementBinding
 import com.jaques.projetos.organizze.model.Movement
+import com.jaques.projetos.organizze.model.MovementType
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
-/** author Leonardo Jaques on 18/08/20 */
-class MovementAdapter(listMovement: ArrayList<Movement>) :
-    RecyclerView.Adapter<MovementAdapter.MyViewHolder>() {
-    private val list = listMovement
+class MovementAdapter(private val list: MutableList<Movement>) :
+    RecyclerView.Adapter<MovementAdapter.ViewHolder>() {
 
+    private val currencyFormat = DecimalFormat(
+        "#,##0.00",
+        DecimalFormatSymbols(Locale("pt", "BR"))
+    )
 
-    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.findViewById(R.id.textAdapterTitle)
-        val value: TextView = itemView.findViewById(R.id.textAdapterValue)
-        val category: TextView = itemView.findViewById(R.id.textAdapterCategoy)
+    private var expenseColor: Int = 0
+    private var revenueColor: Int = 0
+
+    inner class ViewHolder(private val binding: AdapterMovementBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(movement: Movement) {
+            if (expenseColor == 0) {
+                expenseColor = ContextCompat.getColor(itemView.context, R.color.expense)
+                revenueColor = ContextCompat.getColor(itemView.context, R.color.revenue)
+            }
+
+            binding.textAdapterTitle.text = movement.description
+            binding.textAdapterCategoy.text = movement.category
+
+            when (movement.type) {
+                MovementType.EXPENSE -> {
+                    binding.textAdapterValue.text = "- R$ ${currencyFormat.format(movement.value)}"
+                    binding.textAdapterValue.setTextColor(expenseColor)
+                }
+                MovementType.REVENUE -> {
+                    binding.textAdapterValue.text = "R$ ${currencyFormat.format(movement.value)}"
+                    binding.textAdapterValue.setTextColor(revenueColor)
+                }
+            }
+        }
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): MyViewHolder {
-        val itemList: View =
-            LayoutInflater.from(parent.context).inflate(R.layout.adapter_movement, parent, false)
-        return MyViewHolder(itemList)
+    fun submitList(newList: List<Movement>) {
+        val diffResult = DiffUtil.calculateDiff(MovementDiffCallback(list, newList))
+        list.clear()
+        list.addAll(newList)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = AdapterMovementBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return ViewHolder(binding)
     }
 
     override fun getItemCount(): Int = list.size
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
-        val movement: Movement = list[position]
-        holder.title.text = movement.description
-        holder.value.text = movement.value.toString()
-        holder.category.text = movement.category
-
-        if (movement.type.equals("e")) {
-            holder.value.text = "- ${movement.value}"
-            holder.value.setTextColor(Color.parseColor("#FF706A"))
-        } else holder.value.setTextColor(Color.parseColor("#00D39E"))
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(list[position])
     }
 
-
+    private class MovementDiffCallback(
+        private val oldList: List<Movement>,
+        private val newList: List<Movement>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
+        override fun getNewListSize() = newList.size
+        override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldList[oldPos].id == newList[newPos].id
+        override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldList[oldPos] == newList[newPos]
+    }
 }
-
-
