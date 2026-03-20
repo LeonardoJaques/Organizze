@@ -1,52 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="3dp">
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/cardBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textAdapterTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:text="Titulo"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/textAdapterValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="valor"
-                android:textColor="#00D39E"
+                android:textColor="@color/textPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textAdapterCategoy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Categoria"
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp" />
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textAdapterCategoy"
+            android:id="@+id/textAdapterValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:text="Categoria"
-            android:textColor="#696969"
-            android:textSize="14sp" />
-
+            android:layout_marginStart="12dp"
+            android:text="valor"
+            android:textColor="@color/revenue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

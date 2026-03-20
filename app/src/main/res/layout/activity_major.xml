@@ -22,7 +22,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_major" />
+    <include android:id="@+id/contentMajor" layout="@layout/content_major" />
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/menu"

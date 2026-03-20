@@ -8,10 +8,11 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="wrap_content"
+        android:background="@color/balanceBackground"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingVertical="24dp">
 
         <TextView
             android:id="@+id/textWelcomeUser_Major"
@@ -20,25 +21,29 @@
             android:text="@string/charge"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="16sp"
+            android:alpha="0.85" />
 
         <TextView
             android:id="@+id/textView_Balance_Major"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/balance_major"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="24sp" />
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="Saldo geral"
             android:textAlignment="center"
-            android:textColor="@android:color/white" />
-
+            android:textColor="@android:color/white"
+            android:alpha="0.7"
+            android:textSize="13sp" />
 
     </LinearLayout>
 
@@ -46,14 +51,15 @@
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:mcv_selectionColor="#00F"
+        app:mcv_selectionColor="@color/colorPrimary"
         app:mcv_tileSize="50dp"
         app:mcv_showOtherDates="all" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerViewMovement"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:paddingVertical="4dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

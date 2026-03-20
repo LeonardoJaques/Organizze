@@ -5,7 +5,13 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Wallet body -->
+    <!-- Background circle -->
+    <path
+        android:fillColor="#1A73E8"
+        android:pathData="M54,54m-42,0a42,42 0,1 1,84 0a42,42 0,1 1,-84 0" />
+
+    <!-- Dollar sign / wallet shape -->
+    <!-- Outer wallet body -->
     <path
         android:fillColor="#FFFFFF"
         android:pathData="M32,38 C32,35.8 33.8,34 36,34 L72,34 C74.2,34 76,35.8 76,38 L76,70 C76,72.2 74.2,74 72,74 L36,74 C33.8,74 32,72.2 32,70 Z" />
