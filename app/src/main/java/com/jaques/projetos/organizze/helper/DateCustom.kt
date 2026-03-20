@@ -1,31 +1,17 @@
 package com.jaques.projetos.organizze.helper
 
-import com.prolificinteractive.materialcalendarview.CalendarDay
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
+object DateCustom {
 
-/** author Leonardo Jaques on 12/08/20 */
-class DateCustom {
+    private val brLocale = Locale("pt", "BR")
 
-    companion object {
+    fun dateCurrent(): String =
+        SimpleDateFormat("dd/MM/yyyy", brLocale).format(Date())
 
-
-        fun dateCurrent(): String {
-            val current = LocalDateTime.now()
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            return current.format(formatter)
-        }
-
-        fun dateChoose(date: String): String {
-            val returnDate = date.split("/")
-//            val day = returnDate[0]
-            val month = returnDate[1]
-            val year = returnDate[2]
-            return month + year
-        }
-
-
+    fun dateChoose(date: String): String {
+        val parts = date.split("/")
+        return parts[1] + parts[2]
     }
-
 }
